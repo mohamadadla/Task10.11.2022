@@ -1,28 +1,29 @@
 package controller
 
 import (
+	"adla.com/task10.11.2022/repository"
 	"net/http"
 
 	"adla.com/task10.11.2022/entity"
 	"github.com/labstack/echo/v4"
 )
 
-type StrudentController struct {
+type StudentController struct {
+	StudentRepository repository.StudentRepository
 }
 
-func (receiver StrudentController) GetAll(c echo.Context) error {
+func (r StudentController) GetAll(c echo.Context) error {
 
-	studententities := []entity.Student{}
-	return c.JSON(http.StatusOK, studententities)
+	return c.JSON(http.StatusOK, r.StudentRepository.GetAll())
 }
 
-func (receiver StrudentController) Get(c echo.Context) error {
+func (r StudentController) Get(c echo.Context) error {
 
 	studententity := &entity.Student{}
 	return c.JSON(http.StatusOK, studententity)
 }
 
-func (receiver StrudentController) Create(c echo.Context) error {
+func (r StudentController) Create(c echo.Context) error {
 
 	studententity := &entity.Student{}
 
@@ -33,7 +34,7 @@ func (receiver StrudentController) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, studententity)
 }
 
-func (receiver StrudentController) PUT(c echo.Context) error {
+func (r StudentController) PUT(c echo.Context) error {
 
 	studententity := &entity.Student{}
 
@@ -44,7 +45,7 @@ func (receiver StrudentController) PUT(c echo.Context) error {
 	return c.JSON(http.StatusOK, studententity)
 }
 
-func (receiver StrudentController) DELETE(c echo.Context) error {
+func (r StudentController) DELETE(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, nil)
 }

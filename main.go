@@ -1,13 +1,12 @@
 package main
 
 import (
-	"adla.com/task10.11.2022/controller"
-	"adla.com/task10.11.2022/repository"
+	"adla.com/task10.11.2022/container"
+	"adla.com/task10.11.2022/internal/adapter/db/repository"
+	"adla.com/task10.11.2022/internal/interface/api"
+	"adla.com/task10.11.2022/internal/usecase"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"log"
 )
 
 func main() {
@@ -17,27 +16,44 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// Connect to the "student" database
-	dsn := "host=localhost user=postgres password=@dla port=3307"
-	dbConnection, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db := container.GetDbConnection()
 
-	if err != nil {
-		log.Fatal("error configuring the database: ", err)
-	}
-	log.Println("Hey! You successfully connected to your CockroachDB cluster.")
+	studentController := api.StudentController{
+		GetAllStudents: usecase.GetAllStudents{
+			RepositoryStudent: repository.StudentRepository{
+				DB: db,
+			},
+		},
+		FindById: usecase.FindStudentById{
+			RepositoryStudent: repository.StudentRepository{
+				DB: db,
+			},
+		},
+		CreateStudent: usecase.CreateStudent{
+			RepositoryStudent: repository.StudentRepository{
+				DB: db,
+			},
+		},
 
-	studentController := controller.StudentController{
-		StudentRepository: repository.StudentRepository{
-			DB: dbConnection,
+		DeleteStudent: usecase.DeleteStudent{
+			RepositoryStudent: repository.StudentRepository{
+				DB: db,
+			},
+		},
+
+		EditStudent: usecase.EditStudent{
+			RepositoryStudent: repository.StudentRepository{
+				DB: db,
+			},
 		},
 	}
 
 	// Routes
 	e.GET("/student", studentController.GetAll)
+	e.GET("/studentId", studentController.Get)
 	e.POST("/student", studentController.Create)
-	e.GET("/student/:id", studentController.Get)
-	e.PUT("/student/:id", studentController.PUT)
-	e.DELETE("/student/:id", studentController.DELETE)
+	e.PUT("/student", studentController.Put)
+	e.DELETE("/studentdel", studentController.Delete)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
